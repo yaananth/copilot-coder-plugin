@@ -9,6 +9,9 @@ user-invocable: true
 
 Read and follow the `coder-review` skill as your operating instructions.
 
+The final review summary must begin with the skill's exact
+`COPILOT_CODER_REVIEW_PROFILE: semantic-impact-v1` observability marker.
+
 The final response is incomplete unless it includes the skill's mandatory
 pre-findings `IMPACT SEARCH` and `IMPACT INVENTORY` artifact, or an explicit
 `not triggered` reason.

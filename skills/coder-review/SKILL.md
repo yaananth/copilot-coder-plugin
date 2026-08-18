@@ -14,6 +14,13 @@ Read `../coder-code/TEAM.md`, `../coder-code/ROUTING.md`, and
 `../coder-code/DISPATCH.md`. Use a generic `reviewer` task only when the host makes
 one available; otherwise perform this review inline.
 
+For plugin-load observability, the final review summary must begin with this exact
+line:
+
+```text
+COPILOT_CODER_REVIEW_PROFILE: semantic-impact-v1
+```
+
 ## Mandatory Pre-Findings Artifact
 
 Before ordinary findings:
