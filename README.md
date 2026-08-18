@@ -22,17 +22,18 @@ normal end-to-end flow, or choose a phase agent when that is all you need.
 
 ## Install in Copilot CLI
 
-Install directly from the repository:
-
-```bash
-copilot plugin install yaananth/copilot-coder-plugin
-```
-
-Or register the marketplace and install by plugin name:
+Register the marketplace and install by plugin name:
 
 ```bash
 copilot plugin marketplace add yaananth/copilot-coder-plugin
 copilot plugin install copilot-coder@yaananth-copilot-coder
+```
+
+Direct repository installation also works in current Copilot CLI releases, although
+the CLI marks this path as deprecated:
+
+```bash
+copilot plugin install yaananth/copilot-coder-plugin
 ```
 
 ## Enable in Copilot Coding Agent
@@ -94,7 +95,8 @@ evaluation harness.
 
 ## Publication Status
 
-This repository is publicly visible for Copilot and CCA evaluation under
-all-rights-reserved terms. No license to copy, redistribute, sublicense, or create
-derivative works is granted. Open-source licensing remains gated on the provenance
-review in [PUBLICATION_CHECKLIST.md](PUBLICATION_CHECKLIST.md) and [NOTICE](NOTICE).
+This repository grants permission to download, install, and execute unmodified copies
+for GitHub Copilot use and evaluation. Redistribution, modified copies, derivative
+works, and broader product use remain restricted. Open-source licensing remains gated
+on the provenance review in [PUBLICATION_CHECKLIST.md](PUBLICATION_CHECKLIST.md) and
+[NOTICE](NOTICE).

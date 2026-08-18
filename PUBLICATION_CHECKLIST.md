@@ -1,8 +1,8 @@
 # Open-Source Publication Checklist
 
-This repository is publicly visible for Copilot and CCA evaluation under
-all-rights-reserved terms. Complete every item below before granting a reuse license
-or presenting it as an open-source release.
+This repository is publicly visible under a limited installation-and-evaluation
+license. Complete every item below before granting redistribution, modification, or
+general open-source rights.
 
 - [ ] Confirm ownership and authorization to publish material derived from the private
       source repository.
