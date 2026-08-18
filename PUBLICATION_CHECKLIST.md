@@ -11,7 +11,7 @@ general open-source rights.
 - [x] Run the internal-reference scrub and secret scan.
 - [x] Validate the plugin from a clean environment with no installed name collision.
 - [x] Run control/method behavioral evals and preserve null or mixed results honestly.
-- [ ] Verify hosted Copilot can install the public repository through the current
+- [x] Verify hosted Copilot can install the public repository through the current
       supported settings format.
 - [ ] Select and add the approved public license.
 - [x] Receive explicit user confirmation before changing repository visibility.
