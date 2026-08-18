@@ -20,7 +20,9 @@ alternate arm order across task pairs; record that weaker isolation as a limitat
 1. Pin the source commit, task text, acceptance checks, model/configuration, timeout,
    and allowed tools.
 2. Assign control/method randomly to opaque labels `run-A` and `run-B`.
-3. Start the same hosted coding task in each isolated arm.
+3. Start the same hosted coding task in each isolated arm. In the method prompt,
+   explicitly invoke `/copilot-coder/coder-code`; plugin-supplied custom agents may
+   not be selectable through `gh agent-task --custom-agent`.
 4. Preserve the agent report, command transcript when available, resulting branch or
    pull request, final diff, changed-file list, checks, elapsed time, and failures.
 5. Copy those artifacts into a judge bundle that contains only the opaque label.

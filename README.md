@@ -11,14 +11,16 @@ phases in the current session.
 
 ## Skills
 
-- `/copilot-coder:coder-code` - full coding workflow and phase triage.
-- `/copilot-coder:coder-build` - context bundle only; no code changes.
-- `/copilot-coder:coder-plan` - implementation-ready plan only.
-- `/copilot-coder:coder-review` - diff review and scope-aware closeout.
-- `/copilot-coder:coder-team` - roles, panels, and shared working rules.
+- `/copilot-coder/coder-code` - full coding workflow and phase triage.
+- `/copilot-coder/coder-build` - context bundle only; no code changes.
+- `/copilot-coder/coder-plan` - implementation-ready plan only.
+- `/copilot-coder/coder-review` - diff review and scope-aware closeout.
+- `/copilot-coder/coder-team` - roles, panels, and shared working rules.
 
-The selectable agents mirror these skills. Choose `coder-orchestrator` for the
-normal end-to-end flow, or choose a phase agent when that is all you need.
+Copilot CLI can also load the selectable agents that mirror these skills. For Copilot
+coding agent, invoke the skill path explicitly in the task prompt. As of August 18,
+2026, plugin-supplied agents were not resolved by `gh agent-task --custom-agent`, while
+explicit plugin skills were loaded and executed successfully.
 
 ## Install in Copilot CLI
 
@@ -60,14 +62,20 @@ consumer repository as `.github/copilot/settings.json`:
 Keep the control arm identical except for the plugin setting. See
 [eval/ab/CCA-PROTOCOL.md](eval/ab/CCA-PROTOCOL.md) before running a hosted A/B test.
 
+Start a CCA treatment task with:
+
+```text
+Use the /copilot-coder/coder-code skill for this task.
+```
+
 ## Use
 
 ```text
-/copilot-coder:coder-code add a request timeout to the API client
-/copilot-coder:coder-build map the files needed for a billing retry change
-/copilot-coder:coder-plan split the cache migration into safe work items
-/copilot-coder:coder-review review the current branch
-/copilot-coder:coder-team show the review panel
+/copilot-coder/coder-code add a request timeout to the API client
+/copilot-coder/coder-build map the files needed for a billing retry change
+/copilot-coder/coder-plan split the cache migration into safe work items
+/copilot-coder/coder-review review the current branch
+/copilot-coder/coder-team show the review panel
 ```
 
 The central rule is complete but bounded delivery: treat the user's intended outcome,
