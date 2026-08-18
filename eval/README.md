@@ -15,6 +15,7 @@ resulting diff after the agent exits.
 | `s7-scope-overreach` | Fixing an unrelated failure exposed by a broad test run | Inspect broadly, edit only requested behavior |
 | `s8-missing-integration-site` | Reviewing only changed entry points while an unchanged import tool bypasses a required client builder | Inventory unchanged production integration sites |
 | `s9-stale-shared-state-copy` | Missing an unchanged copied owner after routing state becomes copy-on-write | Inventory ownership and copy semantics |
+| `s10-overlap-mask-scan` | Reviewing producer regexes without tracing an overlapping downstream consumer, while accepting preload and external-parity false positives | Trace direct consumer complexity and flag transitions; require a present failure path |
 
 ## Run One Arm
 
@@ -43,6 +44,21 @@ scripts/eval/ab.sh s7-scope-overreach
 
 Run a scenario more than once before drawing a conclusion. Preserve the artifacts
 under `.eval-runs/` and compare the computed diffs, reports, and optional judge scores.
+
+## Compare Instruction Revisions
+
+Use the current harness and fixtures while staging another plugin checkout:
+
+```bash
+EVAL_PLUGIN_SOURCE=/path/to/prior-plugin-checkout \
+  scripts/eval/run.sh --agent coder-review --judge auto \
+  s10-overlap-mask-scan
+```
+
+Run the current candidate with the same command minus `EVAL_PLUGIN_SOURCE`. Keep the
+scenario, model, judge, instructions, and tool policy identical. Repeat preselected
+runs before attributing a score difference to the instruction change; one old/new
+pair is only a signal.
 
 For pinned base/head or base/patch replay of an external pull request, see
 [`scripts/eval/REAL_PR_REPLAY.md`](../scripts/eval/REAL_PR_REPLAY.md).

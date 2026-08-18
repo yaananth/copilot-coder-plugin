@@ -1,0 +1,71 @@
+diff --git a/mask_hints.py b/mask_hints.py
+--- a/mask_hints.py
++++ b/mask_hints.py
+@@
+ LEGACY_PATTERN = r"\bac_[a-z0-9]{12}\b"
++# No leading boundary: assignment identifiers may be concatenated with a log key,
++# and the complete identifier still has to be masked in that representation.
++NARROW_PATTERN = r"ac_[a-z0-9._-]{12,}"
++BROAD_PATTERN = r"a[bcdef]_[a-z0-9._-]{12,}"
+ 
+-def build_mask_hints():
+-    return [MaskHint(LEGACY_PATTERN)]
++def build_mask_hints(mask_variable_access_ids, mask_all_access_ids):
++    hints = [MaskHint(LEGACY_PATTERN)]
++    if mask_all_access_ids:
++        hints.append(MaskHint(BROAD_PATTERN))
++    elif mask_variable_access_ids:
++        hints.append(MaskHint(NARROW_PATTERN))
++    return hints
+diff --git a/request_handler.py b/request_handler.py
+--- a/request_handler.py
++++ b/request_handler.py
+@@
++NARROW_FLAG = "mask_variable_access_ids"
++BROAD_FLAG = "mask_all_access_ids"
++
+ def build_assignment(request, claims, features, preloaded):
+     actor = request.owner or claims.workspace_owner
+-    return AssignmentResponse(build_mask_hints())
++    narrow = features.enabled_for(preloaded, NARROW_FLAG, actor)
++    broad = features.enabled_for(preloaded, BROAD_FLAG, actor)
++    return AssignmentResponse(build_mask_hints(narrow, broad))
+diff --git a/test_mask_hints.py b/test_mask_hints.py
+--- a/test_mask_hints.py
++++ b/test_mask_hints.py
+@@
++    def test_static_flag_combinations(self):
++        cases = (
++            (False, False, [LEGACY_PATTERN]),
++            (True, False, [LEGACY_PATTERN, NARROW_PATTERN]),
++            (False, True, [LEGACY_PATTERN, BROAD_PATTERN]),
++            (True, True, [LEGACY_PATTERN, BROAD_PATTERN]),
++        )
++        for narrow, broad, expected in cases:
++            self.assertEqual(
++                expected,
++                [hint.pattern for hint in build_mask_hints(narrow, broad)],
++            )
++
++    def test_identifier_concatenated_with_log_key_is_masked(self):
++        response = type(
++            "Response",
++            (),
++            {"masks": build_mask_hints(True, False)},
++        )()
++        self.assertEqual(
++            "trace***",
++            redact_assignment_output(response, "traceac_" + "z" * 20),
++        )
++
++    def test_opaque_identifier_body_has_no_fixed_maximum(self):
++        response = type(
++            "Response",
++            (),
++            {"masks": build_mask_hints(True, False)},
++        )()
++        body = ("segment_1." * 40) + "tail-value"
++        self.assertEqual(
++            "id=*** done",
++            redact_assignment_output(response, "id=ac_" + body + " done"),
++        )

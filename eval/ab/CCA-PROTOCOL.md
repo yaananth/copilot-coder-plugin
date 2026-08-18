@@ -37,7 +37,10 @@ arm selectively.
 The method repository should copy
 [`templates/copilot-settings.json`](../../templates/copilot-settings.json) to
 `.github/copilot/settings.json`. It registers this repository as an extra marketplace
-and enables `copilot-coder@yaananth-copilot-coder`.
+and enables `copilot-coder@yaananth-copilot-coder`. Commit the file to the method
+repository's default branch before starting the task. A selected non-default CCA base
+branch is not sufficient to load the external plugin in the validated August 18,
+2026 hosted flow.
 
 The control repository should use the same source commit and repository instructions
 without the enabled plugin. Preserve the exact settings files used as run artifacts.

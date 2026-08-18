@@ -59,6 +59,10 @@ consumer repository as `.github/copilot/settings.json`:
 }
 ```
 
+Commit this file to the consumer repository's default branch before starting the
+hosted task. In an August 18, 2026 validation, CCA accepted a non-default `--base`
+branch containing this file but did not load the external plugin from it.
+
 Keep the control arm identical except for the plugin setting. See
 [eval/ab/CCA-PROTOCOL.md](eval/ab/CCA-PROTOCOL.md) before running a hosted A/B test.
 

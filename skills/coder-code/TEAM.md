@@ -61,6 +61,16 @@ legitimately be absent from the diff; absence from the diff is not itself a find
 Give a concrete reason for that status. Keep the inventory bounded to the changed
 contract rather than turning review into a general audit.
 
+When a claim depends on a helper, client, or dependency return value, or on data
+interpreted downstream, inspect the direct implementation available in the repository
+or pinned dependency source. Trace miss, error, and fallback paths. When the change
+broadens accepted input or removes a bound, also inspect input-dependent parsing,
+matching, and iteration. For feature-controlled behavior, compare reachable states
+and rollout or rollback transitions with documented guarantees. Keep this to the
+direct runtime path: an analogous implementation or alternate cross-repository route
+is not `missing-required` without evidence that the reviewed flow reaches it or an
+explicit parity contract.
+
 For replacement or copy-on-write behavior, the inventory must explicitly search for:
 
 - pointer/reference owners versus by-value or shallow copies of the changed object;

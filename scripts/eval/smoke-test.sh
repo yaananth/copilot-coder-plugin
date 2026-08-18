@@ -22,12 +22,20 @@ case " $* " in
   *" --secret-env-vars=COPILOT_GITHUB_TOKEN,GH_TOKEN,GITHUB_TOKEN "*) ;;
   *) echo "missing secret environment protection" >&2; exit 92;;
 esac
+case " $* " in
+  *" plugin list "*) ;;
+  *" --disable-builtin-mcps "*) ;;
+  *) echo "missing --disable-builtin-mcps" >&2; exit 99;;
+esac
 [ -d "${GH_CONFIG_DIR:?}" ] || exit 93
 [ -d "${COPILOT_HOME:?}" ] || exit 94
 [ "${HOME:?}" != "${HOST_HOME:?}" ] || exit 95
 [ "${GIT_TERMINAL_PROMPT:?}" = 0 ] || exit 96
 [ -z "${SSH_AUTH_SOCK:-}" ] || exit 97
 [ "${GIT_CONFIG_KEY_0:?}" = credential.helper ] || exit 98
+[ -z "${EVAL_PLUGIN_SOURCE:-}" ] || exit 100
+[ -z "${EVAL_SCEN_DIR:-}" ] || exit 101
+[ -z "${EVAL_OUT:-}" ] || exit 102
 printf '%s\t%s\t%s\n' "$COPILOT_HOME" "$GH_CONFIG_DIR" "$HOME" >>"${TRACE_FILE:?}"
 
 plugin_dir=""
@@ -56,6 +64,7 @@ PY
     ;;
   *)
     if [ "$judge" -eq 1 ]; then
+      printf '%s\n' 'Judge preamble that must not break JSON extraction.'
       printf '%s\n' '{"correct_action":2,"evidence":2,"verification":2,"report":2,"total":8,"verdict":"pass","note":"smoke"}'
     else
       printf '%s\n' 'Smoke review completed without edits.'
@@ -64,6 +73,53 @@ PY
 esac
 SH
 chmod +x "$TMP_ROOT/bin/copilot"
+
+cat >"$TMP_ROOT/score-preamble.txt" <<'EOF'
+Judge preamble.
+```json
+{"correct_action":2,"evidence":2,"verification":2,"report":2,"note":"ok"}
+```
+EOF
+"$ROOT/scripts/eval/validate-score.py" "$TMP_ROOT/score-preamble.txt" | grep -q '"total":8'
+
+cat >"$TMP_ROOT/score-nested.txt" <<'EOF'
+{"correct_action":2,"evidence":2,"verification":2,"report":2,"note":{"correct_action":0,"evidence":0,"verification":0,"report":0}}
+EOF
+if "$ROOT/scripts/eval/validate-score.py" "$TMP_ROOT/score-nested.txt" >/dev/null 2>&1; then
+  echo "score validator accepted a nested score-shaped note" >&2
+  exit 1
+fi
+
+cat >"$TMP_ROOT/score-multiple.txt" <<'EOF'
+{"correct_action":0,"evidence":0,"verification":0,"report":0,"note":"draft"}
+{"correct_action":2,"evidence":2,"verification":2,"report":2,"note":"final"}
+EOF
+if "$ROOT/scripts/eval/validate-score.py" "$TMP_ROOT/score-multiple.txt" >/dev/null 2>&1; then
+  echo "score validator accepted multiple top-level score objects" >&2
+  exit 1
+fi
+
+for malformed in array bool string fraction; do
+  case "$malformed" in
+    array)
+      payload='[{"correct_action":2,"evidence":2,"verification":2,"report":2,"note":"wrapped"}]'
+      ;;
+    bool)
+      payload='{"correct_action":true,"evidence":2,"verification":2,"report":2,"note":"bool"}'
+      ;;
+    string)
+      payload='{"correct_action":"2","evidence":2,"verification":2,"report":2,"note":"string"}'
+      ;;
+    fraction)
+      payload='{"correct_action":1.9,"evidence":2,"verification":2,"report":2,"note":"fraction"}'
+      ;;
+  esac
+  printf '%s\n' "$payload" >"$TMP_ROOT/score-$malformed.txt"
+  if "$ROOT/scripts/eval/validate-score.py" "$TMP_ROOT/score-$malformed.txt" >/dev/null 2>&1; then
+    echo "score validator accepted malformed $malformed score" >&2
+    exit 1
+  fi
+done
 
 export PATH="$TMP_ROOT/bin:$PATH"
 export COPILOT_GITHUB_TOKEN="smoke-token"
@@ -136,7 +192,8 @@ for case_id in head-case patch-case; do
 done
 
 : >"$TRACE_FILE"
-EVAL_OUT="$TMP_ROOT/run-out" "$ROOT/scripts/eval/run.sh" all
+EVAL_OUT="$TMP_ROOT/run-out" "$ROOT/scripts/eval/run.sh" --judge smoke all
+find "$TMP_ROOT/run-out" -name score.json -type f | grep -q .
 home_count="$(cut -f1 "$TRACE_FILE" | sort -u | wc -l | tr -d ' ')"
 [ "$home_count" -ge 4 ] || {
   echo "expected independent preflight/scenario homes, saw $home_count" >&2

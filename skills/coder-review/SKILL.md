@@ -40,6 +40,13 @@ IMPACT INVENTORY: contract=<...>
   status=<changed | unchanged-valid | missing-required | unknown> | evidence=<...>
 ```
 
+When the contract is feature-controlled, also output:
+
+```text
+FEATURE TRANSITIONS: states=<reachable combinations>; rollout=<path>;
+rollback=<path>; guarantees=<matched or violated, with evidence>
+```
+
 If no impact trigger exists, output `IMPACT INVENTORY: not triggered — <reason>`.
 Do not proceed to the final findings without this artifact.
 
@@ -63,6 +70,13 @@ Status is about the current final code, not whether a file appears in the diff:
    A `missing-required` site is actionable; an unexplained `unknown` blocks a clean
    completeness verdict. An unchanged site that already uses the required path is
    `unchanged-valid`, not a stale-diff finding.
+   For feature-controlled behavior, enumerate reachable flag combinations and the
+   rollout or rollback transitions promised by code or documentation. Static
+   combination tests do not by themselves prove a transition or fallback invariant.
+   For every supported enabled state, apply each independent disable or kill-switch
+   transition and state the resulting behavior. A fallback guarantee is satisfied
+   only when it holds from every supported pre-state or the required pre-state
+   invariant is explicit and enforced.
    For replacement or copy-on-write changes, explicitly search for value/shallow
    copies, constructors that store the object by value, cached derived collections,
    snapshots, and long-lived objects created before runtime updates.
@@ -73,8 +87,14 @@ Status is about the current final code, not whether a file appears in the diff:
    from an edited assertion or a green-looking diff. Claim that a command, test, or
    reproduction ran only when the current review actually executed it and observed the
    result; otherwise label the conclusion as static reasoning.
-5. Report only actionable findings, ordered by severity. If no finding is supported,
-   say so and name remaining verification gaps.
+5. Report only actionable findings, ordered by severity. Before elevating an
+   observation to a finding, name the currently reachable call, input, or state that
+   fails and the violated contract or concrete consequence. A risky API shape,
+   hypothetical future misuse, or maintainability preference without a current
+   failing path belongs in `Out-of-scope observations`, not the findings list. Do not
+   assign a `P` severity to an `unknown` or unverified site; keep it in verification
+   gaps until the affected runtime path is proven. If no finding is supported, say so
+   and name remaining verification gaps.
 
 ## Finding Format
 
@@ -85,6 +105,9 @@ IMPACT INVENTORY: contract=<changed behavior or ownership rule>
 - <path/symbol> | role=<constructor/caller/consumer/copy/cache/etc.> |
   status=<changed | unchanged-valid | missing-required | unknown> | evidence=<why>
 ```
+
+For a feature-controlled contract, place the mandatory `FEATURE TRANSITIONS` line
+immediately after the inventory.
 
 ```markdown
 ### [P<severity>] <short title>

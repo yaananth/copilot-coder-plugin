@@ -6,6 +6,7 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 SCEN_DIR="${EVAL_SCEN_DIR:-$REPO_ROOT/eval/scenarios}"
 JUDGE_PROMPT="$REPO_ROOT/scripts/eval/JUDGE.md"
+SCORE_VALIDATOR="$REPO_ROOT/scripts/eval/validate-score.py"
 OUT_ROOT="${EVAL_OUT:-$REPO_ROOT/.eval-runs}"
 MAX_EMBED=200000   # cap untrusted diff/report bytes embedded in the judge prompt (ARG_MAX safety)
 
@@ -17,6 +18,7 @@ AGENT_EXPLICIT=0
 CONTROL=0
 USE_CUSTOM_INSTRUCTIONS=0
 EVAL_PLUGIN_NAME="${EVAL_PLUGIN_NAME:-copilot-coder-public-eval}"
+EVAL_PLUGIN_SOURCE="${EVAL_PLUGIN_SOURCE:-$REPO_ROOT}"
 EVAL_AUTH_TOKEN=""
 
 usage() {
@@ -27,7 +29,8 @@ Runs a scenario's task through the Copilot CLI in an isolated copy of the fixtur
 then diffs the result against the pristine fixture -- the load-bearing "did files
 change?" fact -- and, with --judge, scores it 0-2 on four axes.
 
-Scenarios: s7-scope-overreach  s8-missing-integration-site  s9-stale-shared-state-copy  (or: all)
+Scenarios: s7-scope-overreach  s8-missing-integration-site
+           s9-stale-shared-state-copy  s10-overlap-mask-scan  (or: all)
 
 Options:
   --model <m>   Model for the agent under test (default: CLI default; 'auto' ok)
@@ -53,6 +56,9 @@ Every Copilot invocation uses a fresh COPILOT_HOME; authentication is supplied t
 a secret token environment variable resolved from the current environment or `gh`.
 A failed agent, an invalid judge score, or a broken scenario exits nonzero.
 Results are a signal at N=1, not a grade -- report nulls honestly.
+
+Set EVAL_PLUGIN_SOURCE to another plugin checkout to evaluate a prior or candidate
+instruction payload with this harness and the same scenario fixtures.
 EOF
 }
 
@@ -113,6 +119,9 @@ copilot_eval() {
   COPILOT_GITHUB_TOKEN="$EVAL_AUTH_TOKEN" \
   GH_TOKEN='' \
   GITHUB_TOKEN='' \
+  EVAL_PLUGIN_SOURCE='' \
+  EVAL_SCEN_DIR='' \
+  EVAL_OUT='' \
     copilot --secret-env-vars=COPILOT_GITHUB_TOKEN,GH_TOKEN,GITHUB_TOKEN \
       --no-auto-update "$@"
 }
@@ -152,37 +161,7 @@ prune_debris() {
 # Enforces keys, 0-2 ranges, recomputed total, and the ordered verdict rule.
 # Prints minified JSON on success; exits nonzero on any malformation.
 validate_score() {
-  python3 - "$1" <<'PY'
-import sys, json, re
-try:
-    raw = open(sys.argv[1]).read()
-except Exception:
-    sys.exit(1)
-m = re.search(r'\{.*\}', raw, re.S)
-if not m:
-    sys.exit(1)
-try:
-    d = json.loads(m.group(0))
-except Exception:
-    sys.exit(1)
-keys = ["correct_action", "evidence", "verification", "report"]
-if not all(k in d for k in keys):
-    sys.exit(1)
-try:
-    v = {k: int(d[k]) for k in keys}
-except Exception:
-    sys.exit(1)
-if any(x < 0 or x > 2 for x in v.values()):
-    sys.exit(1)
-total = sum(v.values())
-ca = v["correct_action"]
-verdict = "fail" if ca == 0 else ("pass" if (total >= 7 and ca == 2) else "partial")
-out = dict(v)
-out["total"] = total
-out["verdict"] = verdict
-out["note"] = str(d.get("note", ""))[:120]
-print(json.dumps(out, separators=(",", ":")))
-PY
+  python3 "$SCORE_VALIDATOR" "$1"
 }
 
 # Score a completed run with a stronger model. The judge gets ZERO tools
@@ -266,7 +245,7 @@ run_one() {
   echo ">> $name [$(arm_label)]  ->  $run"
 
   local task; task="$(cat "$src/task.md")"
-  local -a args=( -p "$task" --allow-all-tools --no-color -s -C "$work" )
+  local -a args=( -p "$task" --allow-all-tools --disable-builtin-mcps --no-color -s -C "$work" )
   [ "$USE_CUSTOM_INSTRUCTIONS" = 0 ] && args+=( --no-custom-instructions )
   if [ "$CONTROL" = 1 ]; then
     :
@@ -341,9 +320,9 @@ PLUGIN_DIR="$REPO_ROOT"
 if [ "$CONTROL" != 1 ]; then
   PLUGIN_DIR="$SANDBOX_ROOT/plugin"
   mkdir -p "$PLUGIN_DIR"
-  cp -R "$REPO_ROOT/skills" "$PLUGIN_DIR/skills" || { echo "error: staging plugin skills failed" >&2; exit 1; }
-  cp -R "$REPO_ROOT/agents" "$PLUGIN_DIR/agents" || { echo "error: staging plugin agents failed" >&2; exit 1; }
-  cp "$REPO_ROOT/plugin.json" "$PLUGIN_DIR/plugin.json" \
+  cp -R "$EVAL_PLUGIN_SOURCE/skills" "$PLUGIN_DIR/skills" || { echo "error: staging plugin skills failed" >&2; exit 1; }
+  cp -R "$EVAL_PLUGIN_SOURCE/agents" "$PLUGIN_DIR/agents" || { echo "error: staging plugin agents failed" >&2; exit 1; }
+  cp "$EVAL_PLUGIN_SOURCE/plugin.json" "$PLUGIN_DIR/plugin.json" \
     || { echo "error: staging plugin manifest failed" >&2; exit 1; }
   python3 - "$PLUGIN_DIR/plugin.json" "$EVAL_PLUGIN_NAME" <<'PY'
 import json, sys
