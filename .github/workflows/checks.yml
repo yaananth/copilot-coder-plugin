@@ -1,0 +1,55 @@
+name: checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  consistency:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Consistency checks
+        run: python .github/checks.py
+
+      - name: Evaluation harness checks
+        run: |
+          bash -n scripts/eval/*.sh
+          shellcheck scripts/eval/*.sh
+          scripts/eval/smoke-test.sh
+
+      - name: Version bump guard (PRs)
+        if: github.event_name == 'pull_request'
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          changed=$(git diff --name-only "$BASE"...HEAD)
+          echo "changed files:"; echo "$changed"
+          if echo "$changed" | grep -Eq '^(skills/|agents/|AGENTS\.md|README\.md)'; then
+            if echo "$changed" | grep -Fxq '.github/plugin/plugin.json'; then
+              base_v=$(git show "$BASE:.github/plugin/plugin.json" | python -c 'import json,sys; print(json.load(sys.stdin)["version"])')
+              head_v=$(python -c 'import json; print(json.load(open(".github/plugin/plugin.json"))["version"])')
+              if [ "$base_v" = "$head_v" ]; then
+                echo "::error::skills/docs changed but plugin.json version is still $head_v — bump it."
+                exit 1
+              fi
+              newest=$(printf '%s\n%s\n' "$base_v" "$head_v" | sort -V | tail -1)
+              if [ "$newest" != "$head_v" ]; then
+                echo "::error::plugin.json version went backwards ($base_v -> $head_v) — versions must increase."
+                exit 1
+              fi
+              echo "version bumped $base_v -> $head_v"
+            else
+              echo "::error::skills/docs changed but .github/plugin/plugin.json was not touched — bump the version."
+              exit 1
+            fi
+          else
+            echo "no skill/doc changes requiring a version bump"
+          fi

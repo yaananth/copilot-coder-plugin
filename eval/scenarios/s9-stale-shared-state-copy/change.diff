@@ -1,0 +1,16 @@
+diff --git a/routing.py b/routing.py
+--- a/routing.py
++++ b/routing.py
+@@
+-        self.routes[slot] = target
++        updated = list(self.routes)
++        updated[slot] = target
++        self.routes = tuple(updated)
+diff --git a/test_routing.py b/test_routing.py
+--- a/test_routing.py
++++ b/test_routing.py
+@@
++    def test_runtime_target_replaces_route(self):
++        router = Router(["central", "east-2", "east"])
++        router.set_target(1, "east")
++        self.assertEqual("east", router.route(1))
