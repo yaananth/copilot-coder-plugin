@@ -1,0 +1,13 @@
+{
+  "extraKnownMarketplaces": {
+    "yaananth-copilot-coder": {
+      "source": {
+        "source": "github",
+        "repo": "yaananth/copilot-coder-plugin"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "copilot-coder@yaananth-copilot-coder": true
+  }
+}

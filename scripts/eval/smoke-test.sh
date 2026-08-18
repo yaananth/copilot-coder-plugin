@@ -47,7 +47,7 @@ done
 
 case " $* " in
   *" plugin list "*)
-    python3 - "$plugin_dir/.github/plugin/plugin.json" <<'PY'
+    python3 - "$plugin_dir/plugin.json" <<'PY'
 import json
 import sys
 print("External Plugins (via --plugin-dir):")

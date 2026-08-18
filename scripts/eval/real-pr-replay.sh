@@ -49,7 +49,7 @@ if [ ! -s "$CATALOG" ] || [ -z "$CASE_ID" ] || [ -z "$OUT" ]; then
   exit 2
 fi
 [ -n "$PLUGIN_SOURCE" ] || { echo "--plugin-dir is required" >&2; exit 2; }
-[ -f "$PLUGIN_SOURCE/.github/plugin/plugin.json" ] || {
+[ -f "$PLUGIN_SOURCE/plugin.json" ] || {
   echo "plugin manifest missing under $PLUGIN_SOURCE" >&2
   exit 2
 }
@@ -196,11 +196,11 @@ copilot_eval() {
 }
 
 PLUGIN_DIR="$root/plugin"
-mkdir -p "$PLUGIN_DIR/.github/plugin"
+mkdir -p "$PLUGIN_DIR"
 cp -R "$PLUGIN_SOURCE/skills" "$PLUGIN_DIR/skills"
 cp -R "$PLUGIN_SOURCE/agents" "$PLUGIN_DIR/agents"
-cp "$PLUGIN_SOURCE/.github/plugin/plugin.json" "$PLUGIN_DIR/.github/plugin/plugin.json"
-python3 - "$PLUGIN_DIR/.github/plugin/plugin.json" "$EVAL_PLUGIN_NAME" <<'PY'
+cp "$PLUGIN_SOURCE/plugin.json" "$PLUGIN_DIR/plugin.json"
+python3 - "$PLUGIN_DIR/plugin.json" "$EVAL_PLUGIN_NAME" <<'PY'
 import json
 import sys
 

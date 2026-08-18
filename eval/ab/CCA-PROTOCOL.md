@@ -32,10 +32,13 @@ arm selectively.
 
 ## Consumer Configuration
 
-The method repository should enable the public plugin through the current supported
-repository settings format. Validate the identifier and settings schema against the
-live hosted product before committing the file; do not assume private-repository
-behavior proves public plugin discovery.
+The method repository should copy
+[`templates/copilot-settings.json`](../../templates/copilot-settings.json) to
+`.github/copilot/settings.json`. It registers this repository as an extra marketplace
+and enables `copilot-coder@yaananth-copilot-coder`.
+
+The control repository should use the same source commit and repository instructions
+without the enabled plugin. Preserve the exact settings files used as run artifacts.
 
 ## Minimum Pilot
 

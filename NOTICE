@@ -1,4 +1,4 @@
-copilot-coder private validation copy
+copilot-coder public evaluation copy
 Copyright (c) 2026 Yashwanth Anantharaju
 
 Third-party acknowledgements
@@ -31,4 +31,5 @@ SOFTWARE.
 
 The context-curation workflow was conceptually informed by RepoPrompt CE. No claim is
 made here that its license grants rights to any material originating in a private
-repository; publication remains gated on an explicit provenance review.
+repository; open-source licensing and redistribution remain gated on an explicit
+provenance review.

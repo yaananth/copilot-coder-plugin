@@ -20,7 +20,7 @@ def ok(message: str) -> None:
     print(f"ok    {message}")
 
 
-manifest_path = ROOT / ".github" / "plugin" / "plugin.json"
+manifest_path = ROOT / "plugin.json"
 try:
     manifest = json.loads(manifest_path.read_text())
 except Exception as exc:
@@ -55,22 +55,40 @@ else:
 
     for field in ("skills", "agents"):
         entries = manifest.get(field)
+        if isinstance(entries, str):
+            entries = [entries]
         if (
             not isinstance(entries, list)
             or not entries
             or any(not isinstance(entry, str) or not entry.strip() for entry in entries)
         ):
-            error(f"plugin manifest {field} must be a non-empty string array")
+            error(f"plugin manifest {field} must be a path or non-empty path array")
 
     if not errors:
         ok(f"plugin manifest valid ({manifest['name']} v{manifest['version']})")
 
-for relative in manifest.get("skills", []) if isinstance(manifest, dict) else []:
+skill_entries = manifest.get("skills", []) if isinstance(manifest, dict) else []
+if isinstance(skill_entries, str):
+    skill_entries = [skill_entries]
+skills: list[Path] = []
+for relative in skill_entries:
     if not isinstance(relative, str):
         continue
-    skill = ROOT / relative / "SKILL.md"
+    path = ROOT / relative
+    if (path / "SKILL.md").is_file():
+        skills.append(path)
+    elif path.is_dir():
+        found = sorted(candidate for candidate in path.iterdir() if (candidate / "SKILL.md").is_file())
+        if not found:
+            error(f"{relative}: no skill directories found")
+        skills.extend(found)
+    else:
+        error(f"{relative}: skill path missing")
+
+for skill_dir in skills:
+    skill = skill_dir / "SKILL.md"
     if not skill.is_file():
-        error(f"{relative}: SKILL.md missing")
+        error(f"{skill_dir.relative_to(ROOT)}: SKILL.md missing")
         continue
     head = skill.read_text()[:1600]
     if not head.startswith("---\n") or "\nname:" not in head or "\ndescription:" not in head:
@@ -78,12 +96,55 @@ for relative in manifest.get("skills", []) if isinstance(manifest, dict) else []
     else:
         ok(f"{skill.relative_to(ROOT)} frontmatter valid")
 
-for relative in manifest.get("agents", []) if isinstance(manifest, dict) else []:
+agent_entries = manifest.get("agents", []) if isinstance(manifest, dict) else []
+if isinstance(agent_entries, str):
+    agent_entries = [agent_entries]
+agents: list[Path] = []
+for relative in agent_entries:
     if not isinstance(relative, str):
         continue
-    agent = ROOT / relative
+    path = ROOT / relative
+    if path.is_file():
+        agents.append(path)
+    elif path.is_dir():
+        found = sorted(path.glob("*.agent.md"))
+        if not found:
+            error(f"{relative}: no agent files found")
+        agents.extend(found)
+    else:
+        error(f"{relative}: agent path missing")
+
+for agent in agents:
     if not agent.is_file():
-        error(f"{relative}: agent file missing")
+        error(f"{agent.relative_to(ROOT)}: agent file missing")
+
+marketplace_path = ROOT / ".github" / "plugin" / "marketplace.json"
+try:
+    marketplace = json.loads(marketplace_path.read_text())
+except Exception as exc:
+    error(f"{marketplace_path.relative_to(ROOT)}: {exc}")
+    marketplace = {}
+
+if isinstance(marketplace, dict):
+    plugins = marketplace.get("plugins")
+    if not isinstance(plugins, list) or not plugins:
+        error("marketplace plugins must be a non-empty array")
+    else:
+        matching = [
+            plugin for plugin in plugins
+            if isinstance(plugin, dict) and plugin.get("name") == manifest.get("name")
+        ]
+        if len(matching) != 1:
+            error("marketplace must contain exactly one entry for the plugin manifest name")
+        else:
+            plugin = matching[0]
+            if plugin.get("version") != manifest.get("version"):
+                error("marketplace plugin version must match plugin.json")
+            if plugin.get("source") != ".":
+                error("marketplace plugin source must be repository root (.)")
+    metadata = marketplace.get("metadata")
+    if isinstance(metadata, dict) and metadata.get("version") != manifest.get("version"):
+        error("marketplace metadata version must match plugin.json")
 
 link_pattern = re.compile(r"\]\((?!https?://|#)([^)\s]+)\)")
 for markdown in ROOT.rglob("*.md"):

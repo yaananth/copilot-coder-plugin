@@ -1,0 +1,20 @@
+{
+  "name": "copilot-coder",
+  "version": "0.2.0",
+  "description": "Portable coding workflows for GitHub Copilot.",
+  "author": {
+    "name": "Yashwanth Anantharaju",
+    "url": "https://github.com/yaananth"
+  },
+  "homepage": "https://github.com/yaananth/copilot-coder-plugin",
+  "repository": "https://github.com/yaananth/copilot-coder-plugin",
+  "keywords": [
+    "coding",
+    "planning",
+    "review",
+    "scope",
+    "semantic-impact"
+  ],
+  "skills": "./skills",
+  "agents": "./agents"
+}

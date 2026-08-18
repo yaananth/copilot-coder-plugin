@@ -20,16 +20,44 @@ phases in the current session.
 The selectable agents mirror these skills. Choose `coder-orchestrator` for the
 normal end-to-end flow, or choose a phase agent when that is all you need.
 
-## Install
+## Install in Copilot CLI
 
-Install with a Copilot CLI build that supports plugins:
+Install directly from the repository:
 
 ```bash
-copilot
-/plugin install yaananth/copilot-coder-plugin
-exit
-copilot
+copilot plugin install yaananth/copilot-coder-plugin
 ```
+
+Or register the marketplace and install by plugin name:
+
+```bash
+copilot plugin marketplace add yaananth/copilot-coder-plugin
+copilot plugin install copilot-coder@yaananth-copilot-coder
+```
+
+## Enable in Copilot Coding Agent
+
+Add [templates/copilot-settings.json](templates/copilot-settings.json) to the
+consumer repository as `.github/copilot/settings.json`:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "yaananth-copilot-coder": {
+      "source": {
+        "source": "github",
+        "repo": "yaananth/copilot-coder-plugin"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "copilot-coder@yaananth-copilot-coder": true
+  }
+}
+```
+
+Keep the control arm identical except for the plugin setting. See
+[eval/ab/CCA-PROTOCOL.md](eval/ab/CCA-PROTOCOL.md) before running a hosted A/B test.
 
 ## Use
 
@@ -66,6 +94,7 @@ evaluation harness.
 
 ## Publication Status
 
-This repository is private while behavior, provenance, and redistribution rights are
-validated. No public license is granted yet. See [PUBLICATION_CHECKLIST.md](PUBLICATION_CHECKLIST.md)
-and [NOTICE](NOTICE).
+This repository is publicly visible for Copilot and CCA evaluation under
+all-rights-reserved terms. No license to copy, redistribute, sublicense, or create
+derivative works is granted. Open-source licensing remains gated on the provenance
+review in [PUBLICATION_CHECKLIST.md](PUBLICATION_CHECKLIST.md) and [NOTICE](NOTICE).

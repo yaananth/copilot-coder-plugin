@@ -340,12 +340,12 @@ fi
 PLUGIN_DIR="$REPO_ROOT"
 if [ "$CONTROL" != 1 ]; then
   PLUGIN_DIR="$SANDBOX_ROOT/plugin"
-  mkdir -p "$PLUGIN_DIR/.github/plugin"
+  mkdir -p "$PLUGIN_DIR"
   cp -R "$REPO_ROOT/skills" "$PLUGIN_DIR/skills" || { echo "error: staging plugin skills failed" >&2; exit 1; }
   cp -R "$REPO_ROOT/agents" "$PLUGIN_DIR/agents" || { echo "error: staging plugin agents failed" >&2; exit 1; }
-  cp "$REPO_ROOT/.github/plugin/plugin.json" "$PLUGIN_DIR/.github/plugin/plugin.json" \
+  cp "$REPO_ROOT/plugin.json" "$PLUGIN_DIR/plugin.json" \
     || { echo "error: staging plugin manifest failed" >&2; exit 1; }
-  python3 - "$PLUGIN_DIR/.github/plugin/plugin.json" "$EVAL_PLUGIN_NAME" <<'PY'
+  python3 - "$PLUGIN_DIR/plugin.json" "$EVAL_PLUGIN_NAME" <<'PY'
 import json, sys
 path, name = sys.argv[1:]
 with open(path) as fh:
