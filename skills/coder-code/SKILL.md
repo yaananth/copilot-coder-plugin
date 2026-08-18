@@ -14,6 +14,12 @@ Use this skill for non-trivial implementation, debugging, investigation, plannin
 or review requests. Read [ROUTING.md](ROUTING.md), [TEAM.md](TEAM.md), and
 [DISPATCH.md](DISPATCH.md) before choosing the flow.
 
+For plugin-load observability, the final summary must begin with this exact line:
+
+```text
+COPILOT_CODER_CODE_PROFILE: bounded-delivery-v1
+```
+
 ## Workflow
 
 1. **Triage.** State the selected phases in one line. For a question, gather focused

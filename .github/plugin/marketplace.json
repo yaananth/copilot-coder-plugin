@@ -5,13 +5,13 @@
   },
   "metadata": {
     "description": "Portable coding and semantic-impact review workflows for GitHub Copilot.",
-    "version": "0.2.1"
+    "version": "0.2.2"
   },
   "plugins": [
     {
       "name": "copilot-coder",
       "description": "Plan, implement, verify, and review complete but bounded coding changes.",
-      "version": "0.2.1",
+      "version": "0.2.2",
       "author": {
         "name": "Yashwanth Anantharaju"
       },
