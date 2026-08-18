@@ -44,7 +44,10 @@ while [ "$#" -gt 0 ]; do
   esac
 done
 
-[ -s "$CATALOG" ] && [ -n "$CASE_ID" ] && [ -n "$OUT" ] || { usage >&2; exit 2; }
+if [ ! -s "$CATALOG" ] || [ -z "$CASE_ID" ] || [ -z "$OUT" ]; then
+  usage >&2
+  exit 2
+fi
 [ -n "$PLUGIN_SOURCE" ] || { echo "--plugin-dir is required" >&2; exit 2; }
 [ -f "$PLUGIN_SOURCE/.github/plugin/plugin.json" ] || {
   echo "plugin manifest missing under $PLUGIN_SOURCE" >&2

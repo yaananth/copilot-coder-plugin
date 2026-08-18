@@ -77,7 +77,13 @@ command -v copilot >/dev/null 2>&1 || { echo "error: 'copilot' CLI not on PATH" 
 command -v git     >/dev/null 2>&1 || { echo "error: 'git' not on PATH"        >&2; exit 127; }
 command -v python3 >/dev/null 2>&1 || { echo "error: 'python3' not on PATH"     >&2; exit 127; }
 
-arm_label() { [ "$CONTROL" = 1 ] && echo control || echo method; }
+arm_label() {
+  if [ "$CONTROL" = 1 ]; then
+    echo control
+  else
+    echo method
+  fi
+}
 
 resolve_eval_auth_token() {
   local token="${COPILOT_GITHUB_TOKEN:-${GH_TOKEN:-${GITHUB_TOKEN:-}}}"
