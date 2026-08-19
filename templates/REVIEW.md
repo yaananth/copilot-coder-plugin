@@ -2,9 +2,8 @@
 
 Review the requested outcome, not only the changed lines.
 
-Before ordinary findings, name the changed contract and symbols, show the
-repository-wide searches used to find construction/ownership/caller/consumer sites,
-and emit the impact inventory. If the semantic-impact trigger does not apply, say why.
+Before ordinary findings, identify the changed contract and symbols and use
+repository-wide searches to find construction, ownership, caller, and consumer sites.
 
 ## Scope
 
@@ -22,7 +21,7 @@ registration path, backing store or cutover, mutable-state ownership or copy
 semantics, feature-controlled behavior, schema/protocol/event, or behavioral
 dependency contract, do not treat the changed-file list as the full review scope.
 
-Produce a bounded inventory:
+Build a bounded internal inventory:
 
 ```text
 IMPACT INVENTORY: contract=<changed behavior or ownership rule>
@@ -45,7 +44,18 @@ runtime updates.
   reason. Do not flag an unchanged-valid site merely because the diff did not touch it.
 
 Keep this pass tied to the changed contract. It is not a general audit.
-The review output must include the inventory before ordinary findings.
+
+When the review finds 8 or more candidate sites, the diff changes 20 or more files,
+multiple shared contracts changed, or the candidates do not fit in one focused pass,
+divide the inventory into bounded batches for construction/registration,
+callers/consumers, ownership/copies/caches, feature transitions, and
+tests/dependency behavior. Subdivide any oversized category. Process independent
+batches in parallel only when helpers are available; otherwise process them serially.
+Reconcile duplicate or conflicting findings across batches. Treat any unprocessed
+candidate as `unknown`, not as a defect.
+
+Do not require a separate overview comment, visible inventory, or custom output
+format.
 
 ## Findings
 

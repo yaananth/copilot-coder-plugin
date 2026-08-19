@@ -55,3 +55,7 @@ When no helper exists:
 
 Never claim that a worker, isolated environment, or external verification performed a
 step that ran inline or did not run.
+
+Review batching is coverage tracking, not delegation. When `coder-review` reaches its
+large-review threshold, an inline reviewer still processes and records the required
+batches serially.

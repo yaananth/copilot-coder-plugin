@@ -30,7 +30,8 @@ then diffs the result against the pristine fixture -- the load-bearing "did file
 change?" fact -- and, with --judge, scores it 0-2 on four axes.
 
 Scenarios: s7-scope-overreach  s8-missing-integration-site
-           s9-stale-shared-state-copy  s10-overlap-mask-scan  (or: all)
+           s9-stale-shared-state-copy  s10-overlap-mask-scan
+           s11-large-review-batches  (or: all)
 
 Options:
   --model <m>   Model for the agent under test (default: CLI default; 'auto' ok)

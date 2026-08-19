@@ -16,6 +16,7 @@ resulting diff after the agent exits.
 | `s8-missing-integration-site` | Reviewing only changed entry points while an unchanged import tool bypasses a required client builder | Inventory unchanged production integration sites |
 | `s9-stale-shared-state-copy` | Missing an unchanged copied owner after routing state becomes copy-on-write | Inventory ownership and copy semantics |
 | `s10-overlap-mask-scan` | Reviewing producer regexes without tracing an overlapping downstream consumer, while accepting preload and external-parity false positives | Trace direct consumer complexity and flag transitions; require a present failure path |
+| `s11-large-review-batches` | Treating a large constructor family as one opaque pass and missing the final unchanged integration site | Manifest, subdivide, reconcile, and complete bounded review batches |
 
 ## Run One Arm
 

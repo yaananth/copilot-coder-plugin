@@ -1,0 +1,23 @@
+diff --git a/client.py b/client.py
+--- a/client.py
++++ b/client.py
+@@
++class InstrumentedClient:
++    def __init__(self, client, metrics):
++        self.client = client
++        self.metrics = metrics
++
++def build_client(client, metrics):
++    return InstrumentedClient(client, metrics)
+diff --git a/entry_01.py b/entry_01.py
+--- a/entry_01.py
++++ b/entry_01.py
+@@
+-    return DirectClient()
++    return build_client(DirectClient(), metrics)
+diff --git a/entry_02.py b/entry_02.py
+--- a/entry_02.py
++++ b/entry_02.py
+@@
+-    return DirectClient()
++    return build_client(DirectClient(), metrics)

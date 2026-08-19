@@ -31,7 +31,13 @@ Before ordinary findings:
    copies, dereferences passed to constructors, struct/object fields stored by value,
    cached derived collections, snapshots, and long-lived owners created before
    runtime updates.
-4. Output:
+4. When the large-review threshold below is met, output `REVIEW MANIFEST` with
+   explicit bounded batches before the impact inventory. Use at least two batches
+   when there are at least two candidate sites or changed-file review units; never
+   fabricate or duplicate candidates merely to create another batch. This applies
+   even when one reviewer processes every batch inline and serially; batching tracks
+   coverage and is not delegation.
+5. Output:
 
 ```text
 IMPACT SEARCH: symbols=<...>; searches=<...>; candidate sites=<...>
@@ -56,6 +62,28 @@ Status is about the current final code, not whether a file appears in the diff:
   Do not flag it merely because the diff did not touch it.
 - `missing-required` means the current final code still violates the contract and the
   reviewed change is incomplete without updating that site.
+
+## Large Review Batches
+
+Use this protocol when the impact search finds 8 or more candidate sites, the diff
+changes 20 or more files, multiple shared contracts changed, or the candidates do not
+fit in one focused pass:
+
+1. Output `REVIEW MANIFEST: batches=<groups>; reviewed=<sites>; remaining=<sites>;
+   unknown=<sites>`.
+2. Partition candidate sites or changed-file review units into bounded batches for
+   construction/registration, callers/consumers, ownership/copies/caches, feature
+   transitions, and tests/dependency behavior. Subdivide any category that is still
+   too large for one focused pass.
+3. Process independent batches in parallel only when a generic helper is available;
+   otherwise process the same batches serially.
+   Never replace required serial batches with one grouped inventory range merely
+   because all candidates fit in the current context.
+4. Update the manifest after each batch and reconcile duplicate or conflicting
+   findings before the final result.
+5. Do not issue a clean completeness verdict while a required site remains. If a
+   context, tool, or time limit prevents completion, classify the remaining sites as
+   `unknown` and report the exact verification gap.
 
 ## Review Method
 

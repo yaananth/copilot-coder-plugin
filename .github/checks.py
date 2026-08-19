@@ -193,6 +193,18 @@ if deprecated_direct_install in readme:
         "deprecated direct repository install command must not be documented"
     )
 
+review_skill_path = ROOT / "skills" / "coder-review" / "SKILL.md"
+review_skill = review_skill_path.read_text()
+for marker in (
+    "## Large Review Batches",
+    "8 or more candidate sites",
+    "REVIEW MANIFEST:",
+    "coverage and is not delegation",
+    "process the same batches serially",
+):
+    if marker not in review_skill:
+        error(f"{review_skill_path.relative_to(ROOT)}: missing large-review marker {marker!r}")
+
 scenario_root = ROOT / "eval" / "scenarios"
 for scenario in sorted(path for path in scenario_root.iterdir() if path.is_dir()):
     required_files = [scenario / "task.md", scenario / "GROUND-TRUTH.md"]
