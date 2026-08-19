@@ -24,19 +24,32 @@ explicit plugin skills were loaded and executed successfully.
 
 ## Install in Copilot CLI
 
-Register the marketplace and install by plugin name:
+Marketplace installation is the supported path. Register this repository as a
+marketplace, then install the plugin by its marketplace-qualified name:
 
 ```bash
 copilot plugin marketplace add yaananth/copilot-coder-plugin
 copilot plugin install copilot-coder@yaananth-copilot-coder
 ```
 
-Direct repository installation also works in current Copilot CLI releases, although
-the CLI marks this path as deprecated:
+Do not install the repository directly. Copilot CLI warns that direct installs from
+repositories, URLs, and local paths are deprecated and will not be supported in a
+future release.
+
+### Migrate a direct installation
+
+If `copilot plugin list` shows an unqualified `copilot-coder` installation, remove it
+and reinstall through the marketplace:
 
 ```bash
-copilot plugin install yaananth/copilot-coder-plugin
+copilot plugin uninstall copilot-coder
+copilot plugin marketplace add yaananth/copilot-coder-plugin
+copilot plugin install copilot-coder@yaananth-copilot-coder
 ```
+
+Skip the marketplace-add command if `yaananth-copilot-coder` is already registered.
+After migration, `copilot plugin list` should show
+`copilot-coder@yaananth-copilot-coder`.
 
 ## Enable in Copilot Coding Agent
 
