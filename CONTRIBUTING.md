@@ -12,8 +12,10 @@ Thanks for improving `copilot-coder`.
   `skills/coder-code/DISPATCH.md`, and roles/shared bars in
   `skills/coder-code/TEAM.md`.
 - Keep `templates/REVIEW.md` aligned with the semantic-impact and scope rules in
-  `skills/coder-review/SKILL.md`, and keep `templates/copilot-instructions.md`
-  pointing native code review to `/REVIEW.md`.
+  `skills/coder-review/SKILL.md`. `templates/copilot-instructions.md` also owns the
+  CCA automatic-routing contract: use the bare skill names `coder-review` and
+  `coder-code`, identify them as coming from `copilot-coder`, and keep the native
+  review exception aligned with `/REVIEW.md`.
 - Update the manifest version for a user-visible plugin behavior change.
 
 ## Checks
