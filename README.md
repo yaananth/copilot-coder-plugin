@@ -120,6 +120,10 @@ tests, generated artifacts, and integration points when repository evidence show
 they are needed. Do not turn adjacent cleanup or a different failing feature into
 part of the task.
 
+For large reviews (including 8 or more candidate sites), `coder-review` builds a
+candidate manifest, processes bounded batches in parallel when helpers exist or
+serially otherwise, and reconciles the batches before declaring completeness.
+
 To apply the same completeness rules to native GitHub Copilot code review:
 
 1. Copy [`templates/REVIEW.md`](templates/REVIEW.md) to the consumer repository
