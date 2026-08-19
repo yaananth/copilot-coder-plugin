@@ -181,6 +181,18 @@ for invalid in (
             f"use bare CCA skill names instead of {invalid!r}"
         )
 
+readme_path = ROOT / "README.md"
+readme = readme_path.read_text()
+marketplace_install = "copilot plugin install copilot-coder@yaananth-copilot-coder"
+deprecated_direct_install = "copilot plugin install yaananth/copilot-coder-plugin"
+if marketplace_install not in readme:
+    error(f"{readme_path.relative_to(ROOT)}: marketplace install command missing")
+if deprecated_direct_install in readme:
+    error(
+        f"{readme_path.relative_to(ROOT)}: "
+        "deprecated direct repository install command must not be documented"
+    )
+
 scenario_root = ROOT / "eval" / "scenarios"
 for scenario in sorted(path for path in scenario_root.iterdir() if path.is_dir()):
     required_files = [scenario / "task.md", scenario / "GROUND-TRUTH.md"]
