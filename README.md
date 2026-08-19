@@ -63,10 +63,29 @@ Commit this file to the consumer repository's default branch before starting the
 hosted task. In an August 18, 2026 validation, CCA accepted a non-default `--base`
 branch containing this file but did not load the external plugin from it.
 
-Keep the control arm identical except for the plugin setting. See
-[eval/ab/CCA-PROTOCOL.md](eval/ab/CCA-PROTOCOL.md) before running a hosted A/B test.
+To route every hosted review and coding task through the plugin, merge
+[templates/copilot-instructions.md](templates/copilot-instructions.md) into the
+consumer repository's `.github/copilot-instructions.md`. Repository instructions
+must name the installed skills by their bare frontmatter names, `coder-review` and
+`coder-code`, while identifying them as coming from the `copilot-coder` plugin.
+Literal slash paths and `plugin:skill` identifiers did not resolve reliably when
+passed directly to CCA's skill tool.
 
-Start a CCA treatment task with:
+This automatic route was validated on August 19, 2026: CCA cloned the plugin,
+invoked `coder-code`, read its routing/team/dispatch files, implemented and tested a
+change, invoked `coder-review`, and emitted both profile markers. `coder-code` is the
+sole top-level orchestrator inside a coding task. GitHub Copilot App's built-in
+`/orchestrate` skill is useful before a task when work genuinely spans multiple
+sessions or repositories; it should not be required inside every single-repository
+CCA task.
+
+Treat automatic-routing canaries and quality A/Bs as different experiments. A
+quality A/B must omit the mandatory routing instructions from both arms so the
+plugin-disabled control remains a normal CCA run; the method arm enables the plugin
+and prepends the explicit skill invocation shown below. See
+[eval/ab/CCA-PROTOCOL.md](eval/ab/CCA-PROTOCOL.md) before running either experiment.
+
+For a one-off CCA treatment task without repository routing instructions, start with:
 
 ```text
 Use the /copilot-coder/coder-code skill for this task.
@@ -96,8 +115,9 @@ To apply the same completeness rules to native GitHub Copilot code review:
    into the consumer repository's `.github/copilot-instructions.md`. Create that
    file if it does not exist; do not overwrite unrelated repository instructions.
 
-The bridge tells native code review to apply `/REVIEW.md`. Keep both templates
-aligned with `skills/coder-review/SKILL.md`.
+The template routes CCA tasks through the installed skills and tells native code
+review to apply `/REVIEW.md`. Keep the review portion aligned with
+`skills/coder-review/SKILL.md`.
 
 ## Development
 

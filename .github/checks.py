@@ -159,6 +159,28 @@ for markdown in ROOT.rglob("*.md"):
         if not target.exists():
             error(f"{markdown.relative_to(ROOT)}: broken link {match.group(1)}")
 
+instructions_path = ROOT / "templates" / "copilot-instructions.md"
+instructions = instructions_path.read_text()
+for marker in (
+    "`coder-review` skill from the `copilot-coder` plugin",
+    "`coder-code` skill from the `copilot-coder` plugin",
+    "native GitHub Copilot code review",
+):
+    if marker not in instructions:
+        error(f"{instructions_path.relative_to(ROOT)}: missing routing marker {marker!r}")
+
+for invalid in (
+    "/copilot-coder/coder-review",
+    "/copilot-coder/coder-code",
+    "copilot-coder:coder-review",
+    "copilot-coder:coder-code",
+):
+    if invalid in instructions:
+        error(
+            f"{instructions_path.relative_to(ROOT)}: "
+            f"use bare CCA skill names instead of {invalid!r}"
+        )
+
 scenario_root = ROOT / "eval" / "scenarios"
 for scenario in sorted(path for path in scenario_root.iterdir() if path.is_dir()):
     required_files = [scenario / "task.md", scenario / "GROUND-TRUTH.md"]
