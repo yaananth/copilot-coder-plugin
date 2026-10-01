@@ -9,6 +9,12 @@ sandboxes, or a particular Copilot host surface. When a generic task helper is
 available, the workflow can delegate independent work; otherwise it runs the same
 phases in the current session.
 
+Hosts that support separate model and reasoning-effort selection may use the
+cost-aware optional profile in
+[`skills/coder-code/TEAM.md`](skills/coder-code/TEAM.md#optional-host-model-profile).
+The profile is advisory; unsupported hosts continue with any capable agent or inline
+execution.
+
 ## Skills
 
 - `/copilot-coder/coder-code` - full coding workflow and phase triage.
