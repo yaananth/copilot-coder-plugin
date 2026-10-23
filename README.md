@@ -16,8 +16,10 @@ phases in the current session.
 - `/copilot-coder/coder-plan` - implementation-ready plan only.
 - `/copilot-coder/coder-review` - diff review and scope-aware closeout.
 - `/copilot-coder/coder-team` - roles, panels, and shared working rules.
+- `/copilot-coder/share-artifact` - prepare, preview, and share HTML artifacts or
+  static prototypes through an approved destination.
 
-Copilot CLI can also load the selectable agents that mirror these skills. For Copilot
+Copilot CLI can also load the selectable agents that mirror the `coder-*` skills. For Copilot
 coding agent, invoke the skill path explicitly in the task prompt. As of August 18,
 2026, plugin-supplied agents were not resolved by `gh agent-task --custom-agent`, while
 explicit plugin skills were loaded and executed successfully.
@@ -112,6 +114,34 @@ Use the /copilot-coder/coder-code skill for this task.
 /copilot-coder/coder-plan split the cache migration into safe work items
 /copilot-coder/coder-review review the current branch
 /copilot-coder/coder-team show the review panel
+/copilot-coder/share-artifact share ./prototype with my team using our existing preview host
+```
+
+### Share HTML and prototypes
+
+`share-artifact` packages only the intended browser files, checks the rendered
+prototype, and uses the destination and audience you authorize. It works with an
+existing static host, a repository-backed preview service, or a local preview and
+portable ZIP when publishing is unavailable. It does not silently make private
+content public or present localhost as a remotely accessible link.
+
+For Replica Hub, name it in the request and supply your Hub URL and repository.
+The [Replica guide](skills/share-artifact/references/replica.md) covers published
+Builds, repository-access links, and expiring signed-out links. Replica access is
+optional, not a plugin dependency; authentication and permission barriers are
+reported rather than bypassed.
+
+Try the dependency-free [sample](skills/share-artifact/examples/index.html):
+
+```bash
+python3 -m http.server 8000 --bind 127.0.0.1 --directory skills/share-artifact/examples
+```
+
+Open `http://127.0.0.1:8000/` and press **Add vote**. This tests the artifact locally;
+it does not publish it. To exercise the sharing workflow, invoke:
+
+```text
+/copilot-coder/share-artifact prepare skills/share-artifact/examples for sharing; preview locally, but do not publish
 ```
 
 The central rule is complete but bounded delivery: treat the user's intended outcome,
