@@ -17,6 +17,33 @@ This file owns public roles and shared working bars. Route with
 Use a role, not a pinned model. A host may choose its own capable agent or run the
 phase inline.
 
+## Optional Host Model Profile
+
+The public workflow does not require model selection. When a host supports choosing a
+base model and reasoning effort separately, this profile balances role fit, latency,
+and cost:
+
+| Host profile | Portable role or use | Model | `reasoning_effort` |
+|---|---|---|---|
+| `coder-explorer` | `explorer` | `gpt-6-luna` | `low` |
+| `coder-engineer` | `engineer` | `gpt-6-sol` | `high` |
+| `coder-general-expert` | `planner` and the deepest general architecture work | `gpt-6-astra` | `xhigh` |
+| `coder-ux-expert` | UX, product judgment, and open-ended architecture | `claude-opus-5.5` | `xhigh` |
+| `coder-general-expert-second-opinion` | `second-opinion` | `claude-opus-5.5` | `xhigh` |
+| `coder-reviewer` | `reviewer` | `gpt-6.1-sol` | `xhigh` |
+
+Use `gpt-6-luna` for cheap breadth-first discovery, `gpt-6-sol` for balanced
+interactive implementation, and `gpt-6-astra` only where the additional cost is
+justified by long-horizon planning or ambiguous cross-cutting work. Use
+`claude-opus-5.5` for collaborative, open-ended judgment and an independent provider
+perspective. Use `gpt-6.1-sol` for structured review that needs complex coding
+reasoning without defaulting every high-value role to the highest-cost model.
+
+These are recommendations, not dispatch requirements. Do not encode reasoning effort
+in the model ID, require a model-setting API, or stop when a listed model is
+unavailable. The host may substitute another capable agent or run the phase inline
+under [DISPATCH.md](DISPATCH.md).
+
 ## Shared Scope Bar
 
 The user defines the intended outcome, not necessarily every file or dependency
