@@ -41,7 +41,8 @@ documentation, not another customer's settings or an assumed API.
 4. Ask "Which repository should I use?" with the list, allowing a repository not
    listed. Do not choose the first entry. If the user already selected a repository,
    check it directly and continue without asking again. Absence from the picker
-   needs a connection/access check, not an assumption that the repository is invalid.
+   or a 404 needs a connection/access check; neither proves that the repository is
+   invalid or that the GitHub App lacks access.
 
 ## Discover starters and templates
 
@@ -85,8 +86,14 @@ without adding an unsolicited question about switching to it.
 ## Set up the selected repository
 
 1. Inspect only the selected repository's relevant configuration, default branch,
-   visibility, build files, and existing publication workflow. Verify the Hub's
-   GitHub App connection separately from the user's repository permissions.
+   visibility, build files, and existing publication workflow. Keep the user's
+   repository permissions, the GitHub App's repository scope, and the current
+   actor's ability to administer that App separate. Verify each through available
+   authorized evidence; an unavailable administration page does not establish the
+   App's scope. Report unknown connection/access facts as **Not verified**.
+   If an authorized installation administrator is needed, ask for that person's
+   connection/scope check and hand off the unavailable step. Do not offer to perform
+   an App change without the capability or assume a new permission is necessary.
    Discover the actual supported build contract; do not assume arbitrary HTML
    can be uploaded or that the latest public workflow matches this deployment.
 2. When setup is missing, prepare the smallest compatible change. Preserve existing
@@ -97,11 +104,16 @@ without adding an unsolicited question about switching to it.
 3. Show the observed gaps and exact proposed changes. Obtain specific approval
    for any GitHub App repository-access change, setup branch/push or installation
    PR, default-branch merge, and build/publication operation not already authorized.
-   Name files, branch, destination, audience, and effects. Selecting a repository
-   or approving a setup PR does not authorize its merge or public sharing.
+   Name files, the exact branch, destination, audience, and effects. Selecting a
+   repository or approving a setup PR does not authorize its merge or public sharing.
    App access covers the repository, not just the artifact allowlist; disclose that
-   scope. End with exactly one approval question for the next actionable setup
-   operation, not separate audience or future-publication questions. First inspect
+   scope when requesting a verified necessary access change. Ask exactly one
+   approval question for the next actionable operation, including the unchanged
+   default audience rather than asking to choose it again. Do not bundle an
+   App-admin handoff with future setup
+   or publication approval. If its branch, files, build contract, or effects remain
+   unknown, obtain that evidence before requesting mutation approval; a broad
+   "proceed with setup and publishing" question is not a substitute. First inspect
    existing push-triggered workflows: a setup push can itself build and publish.
    If so, disclose and include those effects in this approval; do not promise
    "setup only" or defer approval for an effect the push already triggers.
