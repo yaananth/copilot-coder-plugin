@@ -16,10 +16,11 @@ phases in the current session.
 - `/copilot-coder/coder-plan` - implementation-ready plan only.
 - `/copilot-coder/coder-review` - diff review and scope-aware closeout.
 - `/copilot-coder/coder-team` - roles, panels, and shared working rules.
-- `/copilot-coder/share-artifact` - prepare, preview, and share HTML artifacts or
-  static prototypes through an approved destination.
+- `/copilot-coder/coder-artifact` - publish HTML artifacts or static prototypes
+  through an approved destination and return a verified shareable URL.
 
-Copilot CLI can also load the selectable agents that mirror the `coder-*` skills. For Copilot
+Copilot CLI can also load selectable agents for the coding workflows.
+`coder-artifact` is invoked as a skill. For Copilot
 coding agent, invoke the skill path explicitly in the task prompt. As of August 18,
 2026, plugin-supplied agents were not resolved by `gh agent-task --custom-agent`, while
 explicit plugin skills were loaded and executed successfully.
@@ -114,34 +115,64 @@ Use the /copilot-coder/coder-code skill for this task.
 /copilot-coder/coder-plan split the cache migration into safe work items
 /copilot-coder/coder-review review the current branch
 /copilot-coder/coder-team show the review panel
-/copilot-coder/share-artifact share ./prototype with my team using our existing preview host
+/copilot-coder/coder-artifact share ./prototype with my team using our existing preview host
 ```
 
 ### Share HTML and prototypes
 
-`share-artifact` packages only the intended browser files, checks the rendered
-prototype, and uses the destination and audience you authorize. It works with an
-existing static host, a repository-backed preview service, or a local preview and
-portable ZIP when publishing is unavailable. It does not silently make private
-content public or present localhost as a remotely accessible link.
+`coder-artifact` packages only the intended browser files, checks the rendered
+prototype, and uses the destination and audience you authorize. For live sharing,
+success means a real host-returned URL with the intended build and reviewer access
+verified. A local preview or ZIP is fallback material, not a completed share.
 
-For Replica Hub, name it in the request and supply your Hub URL and repository.
-The [Replica guide](skills/share-artifact/references/replica.md) covers published
-Builds, repository-access links, and expiring signed-out links. Replica access is
-optional, not a plugin dependency; authentication and permission barriers are
-reported rather than bypassed.
+The workflow is repository-agnostic for HTML artifacts and supported static builds;
+it is not a promise that any repository can be hosted without setup. Backend apps
+need their actual runtime and deployment workflow. No customer-specific host,
+organization, repository, or account configuration is bundled with the skill.
 
-Try the dependency-free [sample](skills/share-artifact/examples/index.html):
+When preparing a new prototype or a requested restyle, the skill discovers the
+current customer's accessible starters and templates before asking which look to
+use. A verified GitHub-style starter can be offered as GitHub look; other customers
+see their own available styles, with preview availability and sample/live/unverified
+data information. Custom look means new design work, not an invented starter.
+Publishing an existing artifact preserves its style and skips that question.
+
+The skill discovers an existing configured preview project and routine build
+settings before asking questions. It defaults to a new preview with authenticated
+team access, verifies that access before uploading, and asks only for missing
+consequential decisions or publication approval. Signed-out access requires
+explicit approval and defaults to a 24-hour link where supported. It does not
+enable a hosting service, change access settings, or publish publicly by default.
+If publishing is blocked, it names the blocker and asks the question needed to
+continue. Explicit local-only requests remain supported without seeking a publish
+approval.
+
+For Replica Hub, use your own authorized instance and publishing repository. The
+skill suggests the current customer's configured Hub, lists repositories as ready,
+setup required, or not yet verified, and asks which to use. You may choose another
+repository; the skill checks its prerequisites, proposes minimal setup, and resumes
+publication after the required approvals. Repository choice alone does not authorize
+app access, repository changes, merging setup, or publication.
+
+A restricted Replica link requires GitHub sign-in and read access to the selected
+repository, subject to the Hub's sign-in policy. Sharing it does not grant access.
+A separately approved signed-out link is different: anyone holding it can view the
+Build without repository access. The [Replica guide](skills/coder-artifact/references/replica.md)
+checks the instance's actual build, access, and sharing capabilities. Replica access
+is optional and is not supplied by the plugin; permission barriers are reported
+rather than bypassed.
+
+Try the dependency-free [sample](skills/coder-artifact/examples/index.html):
 
 ```bash
-python3 -m http.server 8000 --bind 127.0.0.1 --directory skills/share-artifact/examples
+python3 -m http.server 8000 --bind 127.0.0.1 --directory skills/coder-artifact/examples
 ```
 
 Open `http://127.0.0.1:8000/` and press **Add vote**. This tests the artifact locally;
 it does not publish it. To exercise the sharing workflow, invoke:
 
 ```text
-/copilot-coder/share-artifact prepare skills/share-artifact/examples for sharing; preview locally, but do not publish
+/copilot-coder/coder-artifact prepare skills/coder-artifact/examples for sharing; preview locally, but do not publish
 ```
 
 The central rule is complete but bounded delivery: treat the user's intended outcome,
