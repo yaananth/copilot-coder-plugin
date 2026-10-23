@@ -59,11 +59,18 @@ build/deployment workflow; a backend-dependent app needs its actual runtime.
   open it. Default an approved signed-out link to 24 hours; disclose the expiry
   before creation. If the provider cannot enforce that expiry, ask before using a
   longer or indefinite lifetime. Do not ask for an expiry already supplied.
-- Before an external mutation not already specifically authorized, present one
-  concise approval request covering the exact file allowlist, host/project, audience,
-  new preview or identified update, and necessary branch/push/deploy operations.
-  Include any signed-out link expiry. Wait for explicit user authorization before
-  performing those operations. Do not re-ask decisions already authorized.
+- Before asking for mutation approval, verify that the next operation is actionable.
+  If a prerequisite for it, such as publisher access, administrator capability,
+  or the required build/workflow contract, is still unverified, ask for that missing
+  check or capable operator first. Do not request conditional approval for a later
+  branch or publication "once" the blocker clears; its files, branch, and effects
+  must be established.
+- For an actionable external mutation not already specifically authorized, present
+  one concise approval request covering the exact file allowlist, host/project,
+  audience, new preview or identified update, and necessary branch/push/deploy
+  operations. Include any signed-out link expiry. Wait for explicit user
+  authorization before performing those operations. Do not re-ask decisions
+  already authorized.
 - Reuse existing authorized sign-in or supported credentials. If authentication
   is missing, name the normal sign-in action and preserve the sharing task for
   resumption; never ask the user to paste tokens into chat. Do not create accounts,
@@ -182,7 +189,9 @@ Lead with the actual outcome:
   requested outcome.
 
 Include the entry point/output, actual audience/access requirement, hosted version
-or commit when available, expiry if any, and concise verification evidence. Never
+or commit when available, verified expiry, and concise verification evidence.
+If lifetime is unknown, say so; absent expiry metadata does not mean no expiry,
+including for restricted previews. Never
 claim publication or an external check that did not occur. Do not put bearer share
 URLs in public PRs/logs unless the user explicitly authorized that destination.
 
