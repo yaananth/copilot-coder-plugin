@@ -1,6 +1,6 @@
 {
   "name": "copilot-coder",
-  "version": "0.2.7",
+  "version": "0.3.1",
   "description": "Portable coding workflows for GitHub Copilot.",
   "author": {
     "name": "Yashwanth Anantharaju",

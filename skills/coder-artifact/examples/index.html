@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Artifact sharing smoke test</title>
+  <style>
+    body { font: 1.125rem/1.6 system-ui, sans-serif; margin: 0; padding: 1.5rem; }
+    main { max-width: 36rem; margin: 8vh auto; }
+    h1 { font-size: clamp(2rem, 8vw, 3.25rem); line-height: 1.15; }
+    button { font: inherit; padding: .65rem 1.25rem; cursor: pointer; }
+    output { display: block; margin: 1rem 0; font-weight: bold; }
+    aside { border-top: 1px solid; margin-top: 2rem; padding-top: 1rem; }
+  </style>
+</head>
+<body>
+  <main>
+    <p>Portable HTML prototype</p>
+    <h1>Artifact sharing smoke test</h1>
+    <p>A self-contained page for checking that a shared prototype runs JavaScript,
+      not just displays a screenshot. No accounts, network calls, or build tools.</p>
+    <button id="vote" type="button">Add vote</button>
+    <output id="result" aria-live="polite">Votes: 0</output>
+    <button id="reset" type="button">Reset</button>
+    <aside>
+      <strong>Expected result</strong>
+      <p>Add vote increases the count. Reset returns it to zero. Reloading starts
+        over; this demo does not store or send votes.</p>
+    </aside>
+    <noscript>This smoke test needs JavaScript for its buttons to work.</noscript>
+  </main>
+  <script>
+    let votes = 0;
+    const result = document.getElementById("result");
+    document.getElementById("vote").addEventListener("click", () => {
+      result.textContent = `Votes: ${++votes}`;
+    });
+    document.getElementById("reset").addEventListener("click", () => {
+      votes = 0;
+      result.textContent = "Votes: 0";
+    });
+  </script>
+</body>
+</html>
