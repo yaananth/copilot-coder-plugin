@@ -153,8 +153,12 @@ without adding an unsolicited question about switching to it.
   default, and approval gate. Use a new prototype branch unless an update was
   requested. Local files and uncommitted edits are not a published Build.
 - Push only what was approved. Wait for both the intended workflow's success and
-  Hub import. Match repository, branch, commit, and Build identity; do not silently
-  share an older Build or mistake a baseline template for the user's prototype.
+  Hub import. If the Hub shows the pushed branch as a pending candidate, use its
+  supported registration action (such as **Add to Hub**) for that approved branch
+  within the existing publication approval. Do not register unrelated branches or
+  change the audience. A successful workflow alone is not a registered prototype.
+  Match repository, branch, commit, and Build identity; do not silently share an
+  older Build or mistake a baseline template for the user's prototype.
 - Use the exact internal prototype URL returned by the Hub for restricted sharing;
   do not create a public share link merely to obtain a shareable URL. If approved
   signed-out sharing is required, create only the scoped link after its policy,
